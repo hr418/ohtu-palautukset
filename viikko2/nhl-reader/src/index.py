@@ -13,11 +13,13 @@ def main():
         if player.nationality == "FIN":
             players.append(player)
 
+    players.sort(key=lambda p: p.goals + p.assists, reverse=True)
+
     print("Players from FIN:")
 
     for player in players:
         print(
-            f"{player.name} team {player.team} goals {player.goals} assists {player.assists}"
+            f"{player.name:20} {player.team:15} {player.goals} + {player.assists} = {player.goals + player.assists}"
         )
 
 
