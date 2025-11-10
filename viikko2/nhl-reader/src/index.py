@@ -4,6 +4,25 @@ from rich.console import Console
 from player import PlayerReader, PlayerStats
 
 
+def make_table(title, players):
+    table = Table(title=title)
+    table.add_column("Released", justify="left", style="cyan")
+    table.add_column("teams", justify="left", style="magenta")
+    table.add_column("goals", justify="right", style="green")
+    table.add_column("assists", justify="right", style="green")
+    table.add_column("points", justify="right", style="green")
+
+    for player in players:
+        table.add_row(
+            player.name,
+            player.team,
+            str(player.goals),
+            str(player.assists),
+            str(player.goals + player.assists),
+        )
+    return table
+
+
 def main():
 
     season = Prompt.ask(
@@ -54,24 +73,10 @@ def main():
 
         top_players = stats.top_scorers_by_nationality(nationality)
 
-        table = Table(title=f"Season {season} players from {nationality}")
-        table.add_column("Released", justify="left", style="cyan")
-        table.add_column("teams", justify="left", style="magenta")
-        table.add_column("goals", justify="right", style="green")
-        table.add_column("assists", justify="right", style="green")
-        table.add_column("points", justify="right", style="green")
-
-        for player in top_players:
-            table.add_row(
-                player.name,
-                player.team,
-                str(player.goals),
-                str(player.assists),
-                str(player.goals + player.assists),
-            )
-
         console = Console()
-        console.print(table)
+        console.print(
+            make_table(f"Season {season} players from {nationality}", top_players)
+        )
 
 
 if __name__ == "__main__":
