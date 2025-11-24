@@ -90,3 +90,45 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.tilimaksu("pekka", "12345")
         # varmistetaan, että metodia tilisiirto on kutsuttu oikeilla arvoilla
         self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", ANY, 5)
+
+    def test_aloita_asiointi_nollaa_edellisen_ostoksen_tiedot(self):
+        # tehdään ostokset
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        # aloitetaan uusi asiointi
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(2)
+        self.kauppa.tilimaksu("matti", "54321")
+
+        # varmistetaan, että metodia tilisiirto on kutsuttu oikeilla arvoilla
+        self.pankki_mock.tilisiirto.assert_called_with("matti", 42, "54321", ANY, 3)
+
+    def test_jokaiselle_maksutapahtumalle_pyydetaan_uusi_viitenumero(self):
+        # ensimmäinen ostos
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        # muutetaan viitegeneraattorin mockin palauttamaa arvoa
+        self.viitegeneraattori_mock.uusi.return_value = 43
+
+        # toinen ostos
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(2)
+        self.kauppa.tilimaksu("matti", "54321")
+
+        # varmistetaan, että metodia tilisiirto on kutsuttu oikeilla arvoilla
+        self.pankki_mock.tilisiirto.assert_called_with("matti", 43, "54321", ANY, 3)
+
+    def test_tuote_poistetaan_korista_onnistuneesti(self):
+        # tehdään ostokset
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.lisaa_koriin(2)
+        self.kauppa.poista_korista(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        # varmistetaan, että metodia tilisiirto on kutsuttu oikeilla arvoilla
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", ANY, 3)
