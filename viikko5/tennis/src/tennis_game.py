@@ -6,7 +6,7 @@ class TennisGame:
     DEUCE_THRESHOLD = 3
     WIN_THRESHOLD = 4
 
-    SCORE_NAMES = {0: "Love", 1: "Fifteen", 2: "Thirty", 3: "Forty"}
+    SCORE_NAMES = {LOVE: "Love", FIFTEEN: "Fifteen", THIRTY: "Thirty", FORTY: "Forty"}
 
     def __init__(self, player1_name, player2_name):
         self.player1_name = player1_name
@@ -32,7 +32,7 @@ class TennisGame:
             return self._get_regular_score()
 
     def _get_tied_score(self):
-        if self.player1_score <= self.DEUCE_THRESHOLD:
+        if self.player1_score < self.DEUCE_THRESHOLD:
             return f"{self.SCORE_NAMES[self.player1_score]}-All"
         return "Deuce"
 
